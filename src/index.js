@@ -1,19 +1,17 @@
-import './index.css'
-
-import React, { PropTypes } from 'react'
-import classNames from 'classnames'
+import React, { Component, PropTypes } from 'react';
+import './index.css';
 
 const { arrayOf, bool, func, number, shape } = PropTypes
 
-export default class LineChart {
+export default class LineChart extends Component {
   static propTypes = {
     activePoint: shape({
       x: number,
-      y: number,
+      y: number
     }),
     data: arrayOf(shape({
       x: number,
-      y: number,
+      y: number
     })).isRequired,
     formatX: func,
     formatY: func,
@@ -29,13 +27,13 @@ export default class LineChart {
     viewBoxHeight: number,
     viewBoxWidth: number,
     yLabelsNb: number,
-    yLabelsWidth: number,
+    yLabelsWidth: number
   }
 
   static defaultProps = {
     activePoint: {
       x: null,
-      y: null,
+      y: null
     },
     data: [],
     hoveredPointRadius: 6,
@@ -50,7 +48,7 @@ export default class LineChart {
     viewBoxHeight: 300,
     viewBoxWidth: 800,
     yLabelsNb: 5,
-    yLabelsWidth: 40,
+    yLabelsWidth: 40
   }
 
   /**
@@ -82,14 +80,14 @@ export default class LineChart {
    */
 
   getSvgX(x) {
-    const { data, nolabel, viewBoxWidth, yLabelsWidth } = this.props
+    const { nolabel, viewBoxWidth, yLabelsWidth } = this.props
     const maxX = this.getMaxX()
     const margin = (!nolabel ? yLabelsWidth * 2 : 0)
     return (x / maxX * (viewBoxWidth - margin))
   }
 
   getSvgY(y) {
-    const { data, nolabel, viewBoxHeight } = this.props
+    const { nolabel, viewBoxHeight } = this.props
     const heightWithoutLabels = viewBoxHeight - (!nolabel ? 20 : 0)
     const maxY = this.getMaxY()
     return heightWithoutLabels - (y / maxY * heightWithoutLabels)
@@ -99,8 +97,8 @@ export default class LineChart {
    * Svg components
    */
 
-  getGrid(chart) {
-    const { data, yLabelsNb } = this.props
+  getGrid() {
+    const { yLabelsNb } = this.props
     const minX = this.getMinX()
     const maxX = this.getMaxX()
     const minY = 0
@@ -141,10 +139,10 @@ export default class LineChart {
   }
 
   getPath() {
-    const { area, data } = this.props
+    const { data } = this.props
     let pathD = 'M ' + this.getSvgX(data[0].x) + ' ' + this.getSvgY(data[0].y) + ' '
 
-    data.map((point, i) => {
+    data.map((point) => {
       pathD += 'L ' + this.getSvgX(point.x) + ' ' + this.getSvgY(point.y) + ' '
     })
 
@@ -157,7 +155,7 @@ export default class LineChart {
     const { data } = this.props
     let pathD = 'M ' + this.getSvgX(data[0].x) + ' ' + this.getSvgY(data[0].y) + ' '
 
-    data.map((point, i) => {
+    data.map((point) => {
       pathD += 'L ' + this.getSvgX(point.x) + ' ' + this.getSvgY(point.y) + ' '
     })
 
@@ -214,7 +212,6 @@ export default class LineChart {
   }
 
   getAxis() {
-    const { data } = this.props
     const minX = this.getMinX()
     const maxX = this.getMaxX()
     const minY = this.getMinY()
@@ -253,7 +250,7 @@ export default class LineChart {
               cx={ this.getSvgX(point.x) }
               cy={ this.getSvgY(point.y) }
               onMouseEnter={ (e) => this.props.onPointHover(point, e.target) }
-              onMouseLeave={ (e) => this.props.onPointHover(null, null) }
+              onMouseLeave={ () => this.props.onPointHover(null, null) }
             />
           )
         })
@@ -267,23 +264,19 @@ export default class LineChart {
       className,
       noarea,
       noaxis,
-      nodata,
       nogrid,
       nolabel,
       nopath,
       nopoint,
-      onClick,
       viewBoxHeight,
       viewBoxWidth,
-      yLabelsWidth,
-      ...props,
+      yLabelsWidth
     } = this.props
 
     return (
       <svg
-        className={ classNames('linechart', (!nolabel || !nopoint) && 'linechart-withPadding', className) }
+        className={ ['linechart', (!nolabel || !nopoint) ? 'linechart-withPadding':null, className].join(' ') }
         viewBox={ `0 0 ${viewBoxWidth} ${viewBoxHeight}` }
-        { ...props }
       >
         <g transform={`translate(${!nolabel ? yLabelsWidth : 0}, 0)`}>
           { !nogrid ? this.getGrid() : null }
